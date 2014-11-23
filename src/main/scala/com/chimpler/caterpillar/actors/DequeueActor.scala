@@ -1,30 +1,22 @@
 package com.chimpler.caterpillar.actors
 
-import akka.actor.{Props, Actor}
-import akka.routing.{RoundRobinRoutingLogic, Router, ActorRefRoutee}
+import akka.actor.{ActorLogging, ActorRef, Props, Actor}
+import akka.routing.{FromConfig}
 import com.chimpler.caterpillar._
 import com.sclasen.akka.kafka.{StreamFSM, AkkaConsumer, CommitConfig, AkkaConsumerProps}
-import grizzled.slf4j.Logging
 import kafka.serializer.StringDecoder
 
 import scala.collection.mutable
+import scala.concurrent.Future
 
-class DequeueActor extends Actor with Logging {
+class DequeueActor extends Actor with ActorLogging {
   val activeCrawls = mutable.Set.empty[String]
+  lazy val downloadRouter = context.system.actorOf(FromConfig.props(Props[DownloadActor]), "router_download")
 
-  var router = {
-    val routees = Vector.fill(5) {
-      val r = context.actorOf(Props[DownloadActor])
-      context watch r
-      ActorRefRoutee(r)
-    }
-    Router(RoundRobinRoutingLogic(), routees)
-  }
-
-  def startKafkaActor(crawlId: String) = {
+  def startKafkaActor(crawlId: String): Future[Unit] = {
     if (!activeCrawls(crawlId)) {
-      info(s"Starting crawl $crawlId")
       activeCrawls += crawlId
+      log.info(s"Starting crawl $crawlId")
       val consumerProps = AkkaConsumerProps.forContext[String, CrawlUrl](
         context = context,
         zkConnect = "localhost:2181",
@@ -37,6 +29,8 @@ class DequeueActor extends Actor with Logging {
         commitConfig = new CommitConfig())
       val consumer = new AkkaConsumer(consumerProps)
       consumer.start()
+    } else {
+      Future.successful()
     }
   }
 
@@ -45,9 +39,9 @@ class DequeueActor extends Actor with Logging {
       startKafkaActor(crawlId)
 
     case crawlUrl: CrawlUrl =>
-      println(s"got url $crawlUrl")
-      router.route(crawlUrl, sender())
-      sender ! StreamFSM.Processed
+      sender() ! StreamFSM.Processed
+      // TODO: maybe forward and have the extractor ack
+      downloadRouter ! crawlUrl
   }
 }
 

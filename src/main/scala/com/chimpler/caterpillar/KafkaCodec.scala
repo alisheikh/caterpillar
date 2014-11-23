@@ -1,10 +1,10 @@
 package com.chimpler.caterpillar
 
-import com.google.common.base.Charsets
 import kafka.serializer.{Encoder, Decoder}
 import kafka.utils.VerifiableProperties
 import com.novus.salat
 import com.novus.salat.global._
+import org.apache.logging.log4j.core.util.Charsets
 
 // encode and decode logs in JSON (in this tuto for readability purpose) but it would be better to consider something like AVRO or protobuf)
 class CrawlUrlDecoder(props: VerifiableProperties = null) extends Decoder[CrawlUrl] {

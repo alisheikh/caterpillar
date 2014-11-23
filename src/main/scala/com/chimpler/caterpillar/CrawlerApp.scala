@@ -9,7 +9,7 @@ import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import scala.collection.JavaConversions._
 
 object CrawlerApp extends App {
-  val config = ConfigFactory.load("crawler/application.conf")
+  val config = ConfigFactory.load("application.conf")
   val system = ActorSystem("caterpillar", config)
 
   // TODO: move it somewhere else
@@ -22,9 +22,7 @@ object CrawlerApp extends App {
   val crawlId = "marcustroy"
   val kafkaConfig = new ProducerConfig(props)
   val producer = new Producer[String, CrawlUrl](kafkaConfig)
-  producer.send(new KeyedMessage[String, CrawlUrl](crawlId, CrawlUrl("http://www.marcustroy.com", referrer = Option("test"))))
-
+  producer.send(new KeyedMessage[String, CrawlUrl](crawlId, CrawlUrl("http://www.marcustroy.com", "marcustroy", referrer = Option("test"))))
   val dequeueActor = system.actorOf(Props(classOf[DequeueActor]), "dequeueActor")
   dequeueActor ! StartCrawlMessage("marcustroy")
-  println("Done!")
 }
