@@ -25,7 +25,13 @@ libraryDependencies ++= Seq(
   // MongoDB
   "org.reactivemongo" %% "reactivemongo" % "0.10.5.0.akka23",
   // Logger
-  "ch.qos.logback" % "logback-classic" % "1.1.2"
+  "ch.qos.logback" % "logback-classic" % "1.1.2",
+  // For Bloom filters
+  "com.google.guava" % "guava" % "18.0",
+  // Off Heap / disk
+  "org.mapdb" % "mapdb" % "1.0.6",
+  // Dependency injection
+  "net.codingwell" %% "scala-guice" % "4.0.0-beta4"
 )
 
 resolvers += "typesafe repo" at " http://repo.typesafe.com/typesafe/releases/"

@@ -1,20 +1,25 @@
-package com.chimpler.caterpillar.actors
+package com.chimpler.caterpillar.actor
 
 import akka.actor.{Props, Actor}
 import akka.routing.{RoundRobinRoutingLogic, Router, ActorRefRoutee}
 import com.chimpler.caterpillar.CrawlUrl
-import com.chimpler.caterpillar.component.{DefaultDownloader}
+import com.chimpler.caterpillar.component.{MongoRawDataStore, DefaultDownloader}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class DownloadActor extends Actor {
+  // TODO: inject it
   val downloader = new DefaultDownloader()
+  val rawDataStore = new MongoRawDataStore()
 
   lazy val extractorActor = context.actorOf(Props[ExtractActor])
 
   override def receive: Receive = {
     case crawlUrl:CrawlUrl =>
-      downloader.download(crawlUrl) map{
-        crawlData => extractorActor ! crawlData
+      downloader.download(crawlUrl) map {
+        crawlData =>
+          rawDataStore.save(crawlData) map {
+            _ => extractorActor ! crawlData
+          }
       }
 
   }

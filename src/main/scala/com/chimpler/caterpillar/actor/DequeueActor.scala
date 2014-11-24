@@ -1,4 +1,4 @@
-package com.chimpler.caterpillar.actors
+package com.chimpler.caterpillar.actor
 
 import akka.actor.{ActorLogging, ActorRef, Props, Actor}
 import akka.routing.{FromConfig}
@@ -9,7 +9,7 @@ import kafka.serializer.StringDecoder
 import scala.collection.mutable
 import scala.concurrent.Future
 
-class DequeueActor extends Actor with ActorLogging {
+class DequeueActor() extends Actor with ActorLogging {
   val activeCrawls = mutable.Set.empty[String]
   lazy val downloadRouter = context.system.actorOf(FromConfig.props(Props[DownloadActor]), "router_download")
 

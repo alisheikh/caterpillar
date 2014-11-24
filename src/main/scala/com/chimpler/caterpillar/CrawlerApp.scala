@@ -3,7 +3,7 @@ package com.chimpler.caterpillar
 import java.util.Properties
 
 import akka.actor.{Props, ActorSystem}
-import com.chimpler.caterpillar.actors.DequeueActor
+import com.chimpler.caterpillar.actor.DequeueActor
 import com.typesafe.config.ConfigFactory
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import scala.collection.JavaConversions._
@@ -18,7 +18,6 @@ object CrawlerApp extends App {
     "metadata.broker.list" -> "127.0.0.1:9093",
     "serializer.class" -> "com.chimpler.caterpillar.CrawlUrlEncoder"
   )
-
   val crawlId = "marcustroy"
   val kafkaConfig = new ProducerConfig(props)
   val producer = new Producer[String, CrawlUrl](kafkaConfig)

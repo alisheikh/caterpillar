@@ -8,4 +8,4 @@ Starting zookeeper:
 
 Starting Kafka:
 
-    kafka-server-start.sh config/kafka-server1.properties
+    kafka-server-start.sh config/kafka-server.properties

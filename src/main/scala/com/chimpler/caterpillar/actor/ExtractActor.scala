@@ -1,4 +1,4 @@
-package com.chimpler.caterpillar.actors
+package com.chimpler.caterpillar.actor
 
 import akka.actor.{ActorLogging, Actor}
 import com.chimpler.caterpillar.CrawlData
