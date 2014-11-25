@@ -38,14 +38,17 @@ class EnqueueActor extends Actor {
 
   val producerMap = mutable.Map.empty[String, Producer[String, CrawlUrl]]
 
-  // TODO: use cuckoo filter instead of bloom filter
-
   override def receive: Receive = {
-    case crawlUrl: CrawlUrl =>
-      crawledLinkSet.existsAndPut(crawlUrl)
+    case crawlUrls: Set[CrawlUrl] =>
+      Future.traverse(crawlUrls) {
+        crawlUrl => crawledLinkSet.existsAndPut(crawlUrl) map {
+          res => if (!res) producer.send(new KeyedMessage[String, CrawlUrl](crawlId, crawlUrl))
+        }
+      }
   }
 
   class CrawledLinkSet {
+    // TODO: use cuckoo filter instead of bloom filter
     val bloomFilter = BloomFilter.create(new CrawlUrlFunnel(), 1000);
     val tempFile = File.createTempFile("caterpillar", ".mapdb")
     val fileMap = DBMaker.newTempHashSet[String]()
@@ -54,16 +57,14 @@ class EnqueueActor extends Actor {
       if (bloomFilter.mightContain(crawlUrl)) {
         // hit the cache
         if (fileMap(crawlUrl.url)) {
-          Future.successful(false)
+          Future.successful(true)
         } else {
           // hit the datastore
-          rawPageStore.exists(crawlId, crawlUrl.url).andThen {
-            case Success(true) =>
-              bloomFilter.put(crawlUrl)
-              producer.send(new KeyedMessage[String, CrawlUrl](crawlId, crawlUrl))
-          }
+          bloomFilter.put(crawlUrl)
+          rawPageStore.exists(crawlId, crawlUrl.url)
         }
       } else {
+        bloomFilter.put(crawlUrl)
         Future.successful(false)
       }
     }
