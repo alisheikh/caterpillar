@@ -1,8 +1,9 @@
 package com.chimpler.caterpillar
 
 import org.joda.time.DateTime
+import reactivemongo.bson.Macros.Annotations.Key
 
-case class CrawlUrl(url: String, crawlId: String, headers: Map[String, List[String]] = Map.empty[String, List[String]], referrer: Option[String] = None, retries: Int = 0)
+case class CrawlUrl(@Key("_id") url: String, crawlId: String, headers: Map[String, List[String]] = Map.empty[String, List[String]], referrer: Option[String] = None, retries: Int = 0)
 
 case class CrawlData(crawlUrl: CrawlUrl, statusCode: Int, data: String, headers: Map[String, List[String]] = Map.empty)
 

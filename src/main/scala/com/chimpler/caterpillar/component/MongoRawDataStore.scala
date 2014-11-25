@@ -15,7 +15,9 @@ class MongoRawDataStore(implicit ec: ExecutionContext) extends RawDataStore {
     def read(bson: BSONDocument): Map[String, List[String]] = {
       bson.elements map {
         // TODO: fix this read
-        case (key, valueList) => key -> List.empty[String]
+        case (key, valueList: BSONArray) => key -> valueList.values.map {
+          case value: BSONString => value.value
+        }.toList
       }
     }.toMap
   }
@@ -23,7 +25,7 @@ class MongoRawDataStore(implicit ec: ExecutionContext) extends RawDataStore {
   implicit val mapWriter = new BSONDocumentWriter[Map[String, List[String]]] {
     def write(map: Map[String, List[String]]): BSONDocument = {
       BSONDocument(map.toStream.map {
-        case (key, valueList) => key -> BSONArray(valueList)
+        case (key, valueList: List[String]) => key -> BSONArray(valueList.map(BSONString))
       })
     }
   }
