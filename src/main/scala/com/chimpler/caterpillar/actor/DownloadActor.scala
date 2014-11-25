@@ -15,12 +15,11 @@ class DownloadActor extends Actor with ActorLogging {
 
   override def receive: Receive = {
     case crawlUrl:CrawlUrl =>
-      downloader.download(crawlUrl) map {
-        crawlData =>
-          rawDataStore.save(crawlData) map {
-            _ =>
-              extractorActor ! crawlData
-          }
+      for {
+        crawlData <- downloader.download(crawlUrl)
+        _ <- rawDataStore.save(crawlData)
+      } yield {
+        extractorActor ! crawlData
       }
 
   }

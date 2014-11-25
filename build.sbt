@@ -33,7 +33,9 @@ libraryDependencies ++= Seq(
   // Off Heap / disk
   "org.mapdb" % "mapdb" % "1.0.6",
   // Dependency injection
-  "net.codingwell" %% "scala-guice" % "4.0.0-beta4"
+  "net.codingwell" %% "scala-guice" % "4.0.0-beta4",
+  // URL normalizer
+  "io.mola.galimatias" % "galimatias" % "0.2.0"
 )
 
 resolvers += "typesafe repo" at " http://repo.typesafe.com/typesafe/releases/"
