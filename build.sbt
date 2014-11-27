@@ -4,7 +4,7 @@ organization := "com.chimpler"
 
 version := "0.0.1"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.4"
 
 val akkaVersion = "2.3.7"
 
@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   // HTML parser
   "org.jodd" % "jodd-lagarto" % "3.6.2",
   // Kafka
-  "com.sclasen" %% "akka-kafka" % "0.0.9-SNAPSHOT" % "compile",
+  "com.sclasen" %% "akka-kafka" % "0.0.9-0.8.2-beta-SNAPSHOT" % "compile",
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
   "org.slf4j" % "log4j-over-slf4j" % "1.7.7" % "compile",
   // Joda
@@ -33,12 +33,12 @@ libraryDependencies ++= Seq(
   // Off Heap / disk
   "org.mapdb" % "mapdb" % "1.0.6",
   // Dependency injection
-  "net.codingwell" %% "scala-guice" % "4.0.0-beta4",
+  "org.scaldi" %% "scaldi-akka" % "0.3.2",
   // URL normalizer
   "io.mola.galimatias" % "galimatias" % "0.2.0"
 )
 
-resolvers += "typesafe repo" at " http://repo.typesafe.com/typesafe/releases/"
+resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 // Local Maven Repository
 resolvers += Resolver.mavenLocal

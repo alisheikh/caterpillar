@@ -14,7 +14,6 @@ class MongoRawDataStore(implicit ec: ExecutionContext) extends RawDataStore {
   implicit val mapReader = new BSONDocumentReader[Map[String, List[String]]] {
     def read(bson: BSONDocument): Map[String, List[String]] = {
       bson.elements map {
-        // TODO: fix this read
         case (key, valueList: BSONArray) => key -> valueList.values.map {
           case value: BSONString => value.value
         }.toList
@@ -59,7 +58,8 @@ class MongoRawDataStore(implicit ec: ExecutionContext) extends RawDataStore {
   }
 
   override def exists(crawlId: String, url: String): Future[Boolean] = {
-    collection.find(BSONDocument("crawlId" -> crawlId)).projection(BSONDocument()).one map {
+    // TODO: optimize this
+    collection.find(BSONDocument("crawlId" -> crawlId), BSONDocument("_id" -> 1)).one[BSONDocument] map {
       case Some(_) => true
       case _ => false
     }
